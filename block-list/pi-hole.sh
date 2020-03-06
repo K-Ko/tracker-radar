@@ -12,8 +12,14 @@
 : ${PHP:=$(which php}
 
 pwd=$(dirname $(readlink -f $0))
+tmp=$(mktemp)
+trap 'rm $tmp' 0
 
 ls -1 $pwd/../domains \
 while read file; do
     $PHP $pwd/pi-hole.php $file
-done > $pwd/pihile.txt
+done > $tmp
+
+sort $tmp | uniq > $pwd/pi-hole.txt
+
+echo Got $(wc -l < $pwd/pi-hole.txt) unique domain entries
